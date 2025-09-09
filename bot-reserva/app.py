@@ -20,6 +20,7 @@ from botbuilder.schema import Activity, ActivityTypes
 
 from bot.main_bot import MainBot
 from config import DefaultConfig
+from dialogs.main_dialog import MainDialog
 
 CONFIG = DefaultConfig()
 
@@ -65,7 +66,8 @@ CONVERSATION_STATE = ConversationState(MEMORY)
 USER_STATE = UserState(MEMORY)
 
 # Create the Bot
-BOT = MainBot(dialog=None, conversation_state=CONVERSATION_STATE, user_state=USER_STATE)
+DIALOG = MainDialog(USER_STATE)
+BOT = MainBot(dialog=DIALOG, conversation_state=CONVERSATION_STATE, user_state=USER_STATE)
 
 # Listen for incoming requests on /api/messages
 async def messages(req: Request) -> Response:
