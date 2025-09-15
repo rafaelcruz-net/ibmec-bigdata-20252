@@ -3,6 +3,9 @@ from botbuilder.dialogs import ComponentDialog, WaterfallDialog, WaterfallStepCo
 from botbuilder.dialogs.prompts import ChoicePrompt, PromptOptions
 from botbuilder.dialogs.choices import Choice
 from dialogs.consultar_matricula import ConsultarMatriculaDialog
+from dialogs.enturmar_aluno import EnturmarAlunoDialog
+from dialogs.quadro_horario import QuadroHorarioDialog
+
 
 class MainDialog(ComponentDialog):
     
@@ -17,6 +20,14 @@ class MainDialog(ComponentDialog):
         
         #Area de Atendimento de Consultar Matricula
         self.add_dialog(ConsultarMatriculaDialog(self.user_state))
+        
+        #Area de Atendimento de Enturmar Aluno
+        self.add_dialog(EnturmarAlunoDialog(self.user_state))
+        
+        #Area de Atendimento de Quadro de Horario
+        self.add_dialog(QuadroHorarioDialog(self.user_state))
+        
+        
         
         #Conversação Sequencial (Steps)        
         self.add_dialog(
@@ -51,20 +62,13 @@ class MainDialog(ComponentDialog):
         if (option == "Consultar Matricula"):
             return await step_context.begin_dialog("ConsultarMatriculaDialog")
         elif (option == "Enturmar Aluno"):
-            return await step_context.context.send_activity(
-                    MessageFactory.text(
-                        "Voce escolheu a opção enturmar aluno"
-                    )
-                )
+            return await step_context.begin_dialog("EnturmarAlunoDialog")
         elif (option == "Quadro de Horario"):
-            return await step_context.context.send_activity(
-                    MessageFactory.text(
-                        "Voce escolheu a opção quadro de horario"
-                    )
-                )
+            return await step_context.begin_dialog("QuadroHorarioDialog")
         elif (option == "Ajuda"):
             return await step_context.context.send_activity(
                     MessageFactory.text(
                         "Voce escolheu a opção Ajuda"
                     )
                 )
+        return await step_context.end_dialog()
