@@ -2,6 +2,7 @@ from botbuilder.core import MessageFactory, UserState
 from botbuilder.dialogs import ComponentDialog, WaterfallDialog, WaterfallStepContext
 from botbuilder.dialogs.prompts import ChoicePrompt, PromptOptions
 from botbuilder.dialogs.choices import Choice
+from dialogs.consultar_matricula import ConsultarMatriculaDialog
 
 class MainDialog(ComponentDialog):
     
@@ -13,6 +14,9 @@ class MainDialog(ComponentDialog):
         
         #Prompt para escolher as opções de atendimento
         self.add_dialog(ChoicePrompt(ChoicePrompt.__name__))
+        
+        #Area de Atendimento de Consultar Matricula
+        self.add_dialog(ConsultarMatriculaDialog(self.user_state))
         
         #Conversação Sequencial (Steps)        
         self.add_dialog(
@@ -45,11 +49,7 @@ class MainDialog(ComponentDialog):
         option = step_context.result.value
         
         if (option == "Consultar Matricula"):
-            return await step_context.context.send_activity(
-                    MessageFactory.text(
-                        "Voce escolheu a opção consultar matricula"
-                    )
-                )
+            return await step_context.begin_dialog("ConsultarMatriculaDialog")
         elif (option == "Enturmar Aluno"):
             return await step_context.context.send_activity(
                     MessageFactory.text(
