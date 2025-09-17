@@ -3,6 +3,9 @@ from botbuilder.core import UserState, MessageFactory
 from botbuilder.dialogs.prompts import ChoicePrompt, PromptOptions
 from botbuilder.dialogs import WaterfallDialog, WaterfallStepContext
 from botbuilder.dialogs.choices import Choice
+from dialogs.consultar_matricula import ConsultarMatriculaDialog
+from dialogs.quadro_horario import QuadroHorarioDialog
+from dialogs.enturmar_aluno import EnturmarAlunoDialog
 
 class MainDialog(ComponentDialog):
     
@@ -15,6 +18,15 @@ class MainDialog(ComponentDialog):
         #Registro do Prompt de escolha
         self.add_dialog(ChoicePrompt(ChoicePrompt.__name__))
         
+        #Area de atendimento de consultar matricula
+        self.add_dialog(ConsultarMatriculaDialog(self.user_state))
+        
+        #Area de atendimento de quadro de horario
+        self.add_dialog(QuadroHorarioDialog(self.user_state))
+        
+        #Area de atendimento de enturmar aluno
+        self.add_dialog(EnturmarAlunoDialog(self.user_state))
+                
         #Registro de Funções de Conversação Sequencial
         self.add_dialog(
             WaterfallDialog(
@@ -34,8 +46,9 @@ class MainDialog(ComponentDialog):
             PromptOptions(
                 prompt=MessageFactory.text("Escolha a opção desejada:"),
                 choices=[
-                    Choice("Cadastrar Evento"),
-                    Choice("Consultar Evento"),
+                    Choice("Consultar Matricula"),
+                    Choice("Enturmar Aluno"),
+                    Choice("Quadro de Horario"),
                     Choice("Ajuda"),
                 ]
             )
@@ -43,15 +56,15 @@ class MainDialog(ComponentDialog):
     async def process_option_step(self, step_context: WaterfallStepContext):
         option = step_context.result.value
         
-        if (option == "Cadastrar Evento"):
-            return await step_context.context.send_activity(
-                MessageFactory.text(f"Voce escolheu a opção Cadastrar Evento")
-            )
-        elif (option == "Consultar Evento"):
-             return await step_context.context.send_activity(
-                MessageFactory.text(f"Voce escolheu a opção Consultar Evento")
-            )           
+        if (option == "Consultar Matricula"):
+            return await step_context.begin_dialog("ConsultarMatriculaDialog")
+        elif (option == "Enturmar Aluno"):
+            return await step_context.begin_dialog("EnturmarAlunoDialog")
+        elif (option == "Quadro de Horario"):
+            return await step_context.begin_dialog("QuadroHorarioDialog")
         elif (option == "Ajuda"):
             return await step_context.context.send_activity(
                 MessageFactory.text(f"Voce escolheu a opção Ajuda")
             )           
+
+
