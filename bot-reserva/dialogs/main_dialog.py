@@ -1,74 +1,77 @@
 from botbuilder.core import MessageFactory, UserState
-from botbuilder.dialogs import ComponentDialog, WaterfallDialog, WaterfallStepContext
-from botbuilder.dialogs.prompts import ChoicePrompt, PromptOptions
-from botbuilder.dialogs.choices import Choice
-from dialogs.consultar_matricula import ConsultarMatriculaDialog
-from dialogs.enturmar_aluno import EnturmarAlunoDialog
-from dialogs.quadro_horario import QuadroHorarioDialog
+from botbuilder.dialogs import ComponentDialog, DialogTurnResult
+from botbuilder.dialogs import WaterfallDialog, WaterfallStepContext
+from botbuilder.dialogs.prompts import ChoicePrompt, TextPrompt, PromptOptions
+from botbuilder.dialogs.choices import Choice, ListStyle
 
+from dialogs.reservar_hotel import ReservarHotelDialog
+from dialogs.reservar_voo import ReservarVooDialog
+from dialogs.consultar_reservas import ConsultarReservasDialog
 
 class MainDialog(ComponentDialog):
-    
     def __init__(self, user_state: UserState):
-        super(MainDialog, self).__init__("MainDialog")
+        super(MainDialog, self).__init__(MainDialog.__name__)
         
-        #Guarda na memoria aonde o usuário parou no dialogo
         self.user_state = user_state
         
-        #Prompt para escolher as opções de atendimento
-        self.add_dialog(ChoicePrompt(ChoicePrompt.__name__))
+        self.add_dialog(TextPrompt(TextPrompt.__name__))
         
-        #Area de Atendimento de Consultar Matricula
-        self.add_dialog(ConsultarMatriculaDialog(self.user_state))
+        # Configurando o ChoicePrompt para usar botões por padrão
+        choice_prompt = ChoicePrompt(ChoicePrompt.__name__)
+        choice_prompt.style = ListStyle.suggested_action
+        self.add_dialog(choice_prompt)
         
-        #Area de Atendimento de Enturmar Aluno
-        self.add_dialog(EnturmarAlunoDialog(self.user_state))
+        # Adicionar diálogos
+        self.add_dialog(ReservarHotelDialog(user_state))
+        self.add_dialog(ReservarVooDialog(user_state))
+        self.add_dialog(ConsultarReservasDialog(user_state))
         
-        #Area de Atendimento de Quadro de Horario
-        self.add_dialog(QuadroHorarioDialog(self.user_state))
-        
-        
-        
-        #Conversação Sequencial (Steps)        
         self.add_dialog(
             WaterfallDialog(
-                "MainDialog",
+                "WaterfallDialog",
                 [
-                    self.prompt_option_step,
-                    self.process_option_step
-                ]
+                    self.mostrar_menu_step,
+                    self.processar_escolha_step,
+                    self.final_step
+                ],
             )
         )
+
+        self.initial_dialog_id = "WaterfallDialog"
+
+    async def mostrar_menu_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+        # Mostrar mensagem de boas-vindas para iniciar
+        await step_context.context.send_activity(
+            MessageFactory.text("Bem-vindo ao TravelBot! 🌴✈️\n\nO que você gostaria de fazer hoje?")
+        )
         
-        self.initial_dialog_id = "MainDialog"
-    
-    async def prompt_option_step(self, step_context: WaterfallStepContext):
+        # Exibir as opções do menu principal com estilo de botão explícito
         return await step_context.prompt(
             ChoicePrompt.__name__,
             PromptOptions(
-                prompt=MessageFactory.text("Escolha a opção desejada:"),
+                prompt=MessageFactory.text("Escolha uma opção:"),
                 choices=[
-                    Choice("Consultar Matricula"),
-                    Choice("Enturmar Aluno"),
-                    Choice("Quadro de Horario"),
-                    Choice("Ajuda")
-                ]
-            )
+                    Choice("Reservar Hotel"), 
+                    Choice("Reservar Voo"), 
+                    Choice("Consultar Minhas Reservas")
+                ],
+                style=ListStyle.suggested_action
+            ),
         )
-    async def process_option_step(self, step_context: WaterfallStepContext):
-        #Captura o que o usuário escolheu de opcao
-        option = step_context.result.value
+
+    async def processar_escolha_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+        # Obter a escolha do usuário
+        escolha = step_context.result.value
         
-        if (option == "Consultar Matricula"):
-            return await step_context.begin_dialog("ConsultarMatriculaDialog")
-        elif (option == "Enturmar Aluno"):
-            return await step_context.begin_dialog("EnturmarAlunoDialog")
-        elif (option == "Quadro de Horario"):
-            return await step_context.begin_dialog("QuadroHorarioDialog")
-        elif (option == "Ajuda"):
-            return await step_context.context.send_activity(
-                    MessageFactory.text(
-                        "Voce escolheu a opção Ajuda"
-                    )
-                )
-        return await step_context.end_dialog()
+        if escolha == "Reservar Hotel":
+            return await step_context.begin_dialog("ReservarHotelDialog")
+        elif escolha == "Reservar Voo":
+            return await step_context.begin_dialog("ReservarVooDialog")
+        elif escolha == "Consultar Minhas Reservas":
+            return await step_context.begin_dialog("ConsultarReservasDialog")
+        
+        return await step_context.next(None)
+    
+    async def final_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+        # Perguntar se o usuário deseja fazer mais alguma coisa
+        return await step_context.replace_dialog(self.id)
