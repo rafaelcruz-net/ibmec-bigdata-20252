@@ -1,25 +1,25 @@
 package br.edu.ibmec.chatbot_api.models;
 
+import org.springframework.data.annotation.Id;
+
+import com.azure.spring.data.cosmos.core.mapping.Container;
+import com.azure.spring.data.cosmos.core.mapping.PartitionKey;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
-@Entity
-@Table(name = "clientes")
+@Container(containerName = "clientes")
 public class Cliente {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @Column(nullable = false)
-    private String nome;
-
-    @Column(nullable = false)
-    private String email;
-
-    @Column(nullable = false)
-    private String celular;
-
-    @Column(nullable = false, unique = true)
+    @PartitionKey
     private String cpf;
+    
+    private String nome;
+    private String email;
+    private String celular;
+    private List<ReservaVoo> reservasVoo;
+    private List<ReservaHotel> reservasHotel;
 }
