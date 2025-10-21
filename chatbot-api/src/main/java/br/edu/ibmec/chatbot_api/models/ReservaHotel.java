@@ -1,6 +1,5 @@
 package br.edu.ibmec.chatbot_api.models;
 
-import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;

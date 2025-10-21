@@ -1,11 +1,12 @@
 package br.edu.ibmec.chatbot_api.models;
 
+import java.util.List;
+
 import org.springframework.data.annotation.Id;
 
 import com.azure.spring.data.cosmos.core.mapping.Container;
 import com.azure.spring.data.cosmos.core.mapping.PartitionKey;
 
-import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
