@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/clientes")
@@ -18,12 +19,12 @@ public class ClienteController {
     private ClienteRepository clienteRepository;
 
     @GetMapping
-    public List<Cliente> getAllClientes() {
+    public Iterable<Cliente> getAllClientes() {
         return clienteRepository.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Cliente> getClienteById(@PathVariable long id) {
+    public ResponseEntity<Cliente> getClienteById(@PathVariable String id) {
         Optional<Cliente> cliente = clienteRepository.findById(id);
         return cliente.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -44,6 +45,7 @@ public class ClienteController {
             return ResponseEntity.ok(existingCliente.get());
         }
 
+        cliente.setId(UUID.randomUUID().toString());
         Cliente savedCliente = clienteRepository.save(cliente);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedCliente);
     }

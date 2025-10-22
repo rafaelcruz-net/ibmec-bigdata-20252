@@ -10,6 +10,7 @@ import com.azure.spring.data.cosmos.config.AbstractCosmosConfiguration;
 import com.azure.spring.data.cosmos.config.CosmosConfig;
 import com.azure.spring.data.cosmos.repository.config.EnableCosmosRepositories;
 
+
 @Configuration
 @EnableConfigurationProperties(CosmosProperties.class)
 @PropertySource("classpath:application.properties")
@@ -18,6 +19,7 @@ public class CosmosConfiguration extends AbstractCosmosConfiguration {
     private CosmosProperties cosmosProperties;
 
     public CosmosConfiguration(CosmosProperties cosmosProperties) {
+        super();
         this.cosmosProperties = cosmosProperties;
     }
 
