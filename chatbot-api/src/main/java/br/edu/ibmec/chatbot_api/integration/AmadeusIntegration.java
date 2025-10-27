@@ -95,6 +95,7 @@ public class AmadeusIntegration {
                 .header("Authorization", "Bearer " + accessToken)
                 .GET()
                 .build();
+                
         var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         
         return response.body();
