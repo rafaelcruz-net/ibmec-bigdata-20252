@@ -4,6 +4,7 @@ from botbuilder.dialogs import WaterfallDialog, WaterfallStepContext
 from botbuilder.dialogs.prompts import ChoicePrompt, TextPrompt, PromptOptions
 from botbuilder.dialogs.choices import Choice, ListStyle
 
+from dialogs.ajuda_dialog import AjudaDialog
 from dialogs.reservar_hotel import ReservarHotelDialog
 from dialogs.reservar_voo import ReservarVooDialog
 from dialogs.consultar_reservas import ConsultarReservasDialog
@@ -25,6 +26,7 @@ class MainDialog(ComponentDialog):
         self.add_dialog(ReservarHotelDialog(user_state))
         self.add_dialog(ReservarVooDialog(user_state))
         self.add_dialog(ConsultarReservasDialog(user_state))
+        self.add_dialog(AjudaDialog(user_state))
         
         self.add_dialog(
             WaterfallDialog(
@@ -53,7 +55,8 @@ class MainDialog(ComponentDialog):
                 choices=[
                     Choice("Reservar Hotel"), 
                     Choice("Reservar Voo"), 
-                    Choice("Consultar Minhas Reservas")
+                    Choice("Consultar Minhas Reservas"),
+                    Choice("Ajuda")
                 ],
                 style=ListStyle.suggested_action
             ),
@@ -69,6 +72,8 @@ class MainDialog(ComponentDialog):
             return await step_context.begin_dialog("ReservarVooDialog")
         elif escolha == "Consultar Minhas Reservas":
             return await step_context.begin_dialog("ConsultarReservasDialog")
+        elif escolha == "Ajuda":
+            return await step_context.begin_dialog("AjudaDialog")
         
         return await step_context.next(None)
     
